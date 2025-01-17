@@ -6,7 +6,7 @@ import 'package:news_app/screens/home_screen.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -16,11 +16,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'News App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomeScreen(),
+      title: 'Newsly',
+      home: const HomeScreen(),
     );
   }
 }

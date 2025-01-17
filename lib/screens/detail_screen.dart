@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:share/share.dart'; // Don't forget to add this dependency in pubspec.yaml
-import 'package:url_launcher/url_launcher.dart'; // Ensure this is added for launching URLs
+import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class DetailScreen extends StatelessWidget {
   final dynamic article;
@@ -12,23 +12,26 @@ class DetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(article['title']),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share), // Share icon
-            onPressed: () {
-              // Implement share functionality
-              Share.share(article['url'], subject: 'Check out this article: ${article['title']}');
-            },
-          ),
-        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          // Enable scrolling for longer articles
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: CachedNetworkImage(
+                    imageUrl: article['urlToImage'] ?? '',
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               Text(
                 article['title'],
@@ -37,7 +40,7 @@ class DetailScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 article['publishedAt'] != null
-                    ? 'Published on: ${article['publishedAt']}'
+                    ? 'Published on: ${DateTime.parse(article['publishedAt'])}'
                     : 'Published on: Unknown',
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
@@ -45,7 +48,7 @@ class DetailScreen extends StatelessWidget {
               Text(
                 article['content'] ?? 'No content available',
                 style: const TextStyle(fontSize: 16),
-              ),
+              ), // Hapus Container dan constraints
               const SizedBox(height: 16),
               Text(
                 'Source: ${article['source']['name']}',
@@ -56,12 +59,10 @@ class DetailScreen extends StatelessWidget {
                 onPressed: () async {
                   try {
                     await launchUrl(Uri.parse(article['url']));
-                    // Optionally show a success SnackBar
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Launching ${article['title']}...')),
                     );
                   } catch (e) {
-                    // Show an error SnackBar if the URL cannot be launched
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error: $e')),
                     );

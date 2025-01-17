@@ -10,21 +10,9 @@ class NewsService {
     apiKey = dotenv.env['API_KEY'] ?? '';
   }
 
-  // Fetch news articles with an optional query for search
   Future<List<dynamic>> fetchData({String query = ''}) async {
-    if (apiKey.isEmpty) {
-      throw Exception('API key is missing. Please check your .env file.');
-    }
-
-    // URL for top headlines in the US
-    String url = '$baseUrl/top-headlines?country=us&apiKey=$apiKey';
-
-    // Append the query if search is active
-    if (query.isNotEmpty) {
-      // Ensure query is URL-encoded to handle spaces or special characters
-      final encodedQuery = Uri.encodeComponent(query);
-      url += '&q=$encodedQuery';
-    }
+    final encodedQuery = Uri.encodeComponent(query);
+    String url = '$baseUrl/everything?q=$encodedQuery&apiKey=$apiKey';
 
     final response = await http.get(Uri.parse(url));
 
